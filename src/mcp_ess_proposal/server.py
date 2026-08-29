@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from typing import Any
 
 from mcp import types
@@ -12,6 +13,8 @@ from .calculator import generate_ess_proposal as generate_ess_proposal_core
 
 SERVER_NAME = "mcp-ess-proposal"
 TOOL_NAME = "generate_ess_proposal"
+LIST_TOOLS_METHOD = types.ListToolsRequest.model_fields["method"].default
+CALL_TOOL_METHOD = types.CallToolRequest.model_fields["method"].default
 
 GENERATE_ESS_PROPOSAL_INPUT_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -84,7 +87,7 @@ GENERATE_ESS_PROPOSAL_INPUT_SCHEMA: dict[str, Any] = {
     ],
 }
 
-GENERATE_ESS_PROPOSAL_OUTPUT_SCHEMA: dict[str, Any] = {
+GENERATE_ESS_PROPOSAL_CONTRACT_OUTPUT_SCHEMA: dict[str, Any] = {
     "oneOf": [
         {
             "type": "object",
@@ -191,34 +194,65 @@ GENERATE_ESS_PROPOSAL_OUTPUT_SCHEMA: dict[str, Any] = {
     ],
 }
 
+GENERATE_ESS_PROPOSAL_OUTPUT_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    **GENERATE_ESS_PROPOSAL_CONTRACT_OUTPUT_SCHEMA,
+}
+
 
 def create_server() -> Server:
     server = Server(SERVER_NAME, version=__version__)
 
-    @server.list_tools()
-    async def list_tools() -> list[types.Tool]:
-        return [
-            types.Tool(
-                name=TOOL_NAME,
-                description=(
-                    "Generate a preliminary solar and energy-storage proposal from "
-                    "structured customer and consumption inputs using deterministic calculation."
-                ),
-                inputSchema=GENERATE_ESS_PROPOSAL_INPUT_SCHEMA,
-                outputSchema=GENERATE_ESS_PROPOSAL_OUTPUT_SCHEMA,
-            )
-        ]
+    async def list_tools(
+        _ctx: Any,
+        _params: types.PaginatedRequestParams,
+    ) -> types.ListToolsResult:
+        return types.ListToolsResult(
+            tools=[
+                types.Tool(
+                    name=TOOL_NAME,
+                    description=(
+                        "Generate a preliminary solar and energy-storage proposal from "
+                        "structured customer and consumption inputs using deterministic calculation."
+                    ),
+                    input_schema=GENERATE_ESS_PROPOSAL_INPUT_SCHEMA,
+                    output_schema=GENERATE_ESS_PROPOSAL_OUTPUT_SCHEMA,
+                )
+            ]
+        )
 
-    @server.call_tool()
-    async def call_tool(name: str, arguments: dict[str, Any]) -> dict[str, Any]:
-        if name != TOOL_NAME:
-            return {
+    async def call_tool(
+        _ctx: Any,
+        params: types.CallToolRequestParams,
+    ) -> types.CallToolResult:
+        arguments = params.arguments or {}
+        if params.name != TOOL_NAME:
+            result = {
                 "status": "error",
                 "code": "VALIDATION_ERROR",
                 "message": "Unknown tool.",
-                "details": {"tool": name},
+                "details": {"tool": params.name},
             }
-        return generate_ess_proposal_core(arguments)
+        else:
+            result = generate_ess_proposal_core(arguments)
+
+        return types.CallToolResult(
+            content=[
+                types.TextContent(
+                    text=json.dumps(
+                        result,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    )
+                )
+            ],
+            structured_content=result,
+            is_error=result.get("status") == "error",
+        )
+
+    server.add_request_handler(LIST_TOOLS_METHOD, types.PaginatedRequestParams, list_tools)
+    server.add_request_handler(CALL_TOOL_METHOD, types.CallToolRequestParams, call_tool)
 
     return server
 

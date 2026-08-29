@@ -14,7 +14,7 @@ Release Candidate means the Core v0 scope, MCP Tool Contract（MCP 工具契约�
 
 ## Quick Start
 
-Prerequisite: Python 3.11 or newer.
+Prerequisite: Python 3.11 or newer and MCP SDK 2.1 or newer.
 
 Install from source:
 

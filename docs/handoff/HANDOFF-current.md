@@ -6,7 +6,7 @@ Date: 2026-08-29
 
 Workflow: IMPL
 
-Status（状态）: **Release Candidate Ready（发布候选就绪）**. MCP Tool Contract is Core v0.2. All gates are decided, the release safety gate passes, and the first tracked baseline is committed locally. Awaiting Publish Approval（发布审批）.
+Status（状态）: **Blocked External Host Auth（外部 Host 认证阻塞） / Pending CI Rerun（等待 CI 重跑）**. MCP Tool Contract is Core v0.2, dependency alignment to MCP SDK 2.1.1 is locally validated, and Release Safety Gate passes. Release Candidate Ready（发布候选就绪） is not restored because true Claude Host E2E could not run without Claude authentication and GitHub CI rerun is not yet observed.
 
 Approval Record（审批记录）:
 
@@ -34,7 +34,7 @@ After PLAN-0002-T4 found private internal detail in Governance Artifacts（治�
 
 ## Current Reality
 
-- The `mcp-ess-proposal` repository has no commits and no tracked files.
+- The `mcp-ess-proposal` repository has an initial pushed baseline at `34a179f01fbfa825a78125e8a24e6ba7b7de9ca1`; the first GitHub CI run failed on MCP SDK dependency drift.
 - Current files include the accepted ADR, approved PLAN, accepted MCP Tool Contract, project scaffold, deterministic Core, neutral fixtures, stdio MCP Server Adapter, tests, and Harness recovery artifacts created during this governed migration.
 - `.ai/state/execution-state.yaml`, `docs/handoff/HANDOFF-current.md`, and `docs/project/` were absent at session start and now exist as Harness recovery / project context artifacts.
 - `private-source-tool` source path is `<PRIVATE_SOURCE_ROOT>`.
@@ -48,6 +48,7 @@ After PLAN-0002-T4 found private internal detail in Governance Artifacts（治�
 - `docs/plan/PLAN-0001-mcp-ess-open-source-migration.md`
 - `docs/plan/PLAN-0002-release-preparation.md`
 - `docs/contracts/mcp-tools.md`
+- `docs/contracts/AMENDMENT-0002-mcp-2-output-schema-normalization.md`
 - `docs/project/PROJECT.md`
 - `.ai/state/execution-state.yaml`
 - `.ai/state/checkpoints/tasks/PLAN-0001-T1.yaml`
@@ -97,24 +98,26 @@ Accepted boundary:
 
 - COMPLETE（已完成）: PLAN-0001 T1-T8; PLAN-0002 T1-T4; PLAN-0003 T1-T10.
 - SUPERSEDED（已被取代）: PLAN-0002-T5, absorbed by PLAN-0003-T10.
-- READY / BLOCKED / INTERRUPTED / ESCALATED: none.
-- Decisions（决策）: ADR-0002 Accepted with D1-D4; CONTRACT AMENDMENT-0001 Accepted for Core v0.2.
+- BLOCKED（阻塞）: true Claude Host E2E cannot run because local Claude Code is not authenticated.
+- READY / INTERRUPTED / ESCALATED: none.
+- Decisions（决策）: ADR-0002 Accepted with D1-D4; CONTRACT AMENDMENT-0001 and AMENDMENT-0002 Accepted for Core v0.2.
 
 ## Release Readiness（发布就绪）
 
 | Item | Result |
 | --- | --- |
 | Contract version | Core v0.2, implemented and schema-verified at runtime |
-| Tests | 55 passed under python3.14 |
-| Claude Code Host E2E | PASS through the registered MCP server |
+| Tests | 58 passed under Python 3.11 + MCP 2.1.1 |
+| Schema fidelity | PASS; runtime discovery adds only approved root `type: object` normalization |
+| Claude Code Host E2E | BLOCKED; local Claude auth is absent (`loggedIn: false`, API 403 before MCP calls) |
 | Release Safety Gate | PASS, 0 findings, 3 allowlisted, 0 unscannable binaries |
-| CI | test-only, Python 3.11, read-only permissions, reviewed; unrun until first CI trigger |
+| CI | first run failed on MCP dependency drift; rerun pending after fix push |
 | Public baseline | 47 files |
-| Package build | wheel built and verified under Python 3.11 |
+| Package build | wheel/sdist built and fresh wheel install smoke passed under Python 3.11 + MCP 2.1.1 |
 
 Excluded from the public baseline per ADR-0002 D4: `AGENTS.md`, `.ai/rules/**`, `.ai/roles/**`, `.ai/workflows/**`, `.ai/VERSION`. Also excluded: `imgs/`, unreferenced personal session screenshots that a text validator cannot scan.
 
-Not authorized and not performed（未授权且未执行）: `git push`, GitHub Release, package registry publish, public announcement.
+Not authorized and not performed（未授权且未执行）: git tag, GitHub Release, package registry publish, public announcement.
 
 ## MCP Learning Points
 
@@ -254,8 +257,45 @@ Two parameters inside the amendment are deliberately unresolved: the consistency
 
 One boundary question is raised for human ruling rather than resolved downstream: whether accepting a scalar tariff parameter crosses the ADR-0001 data-ownership boundary. The amendment assesses that it does not, because server-owned fixtures remain the sole default data source and the client cannot address or replace them. If the reviewer disagrees, the amendment re-routes to ADR.
 
+## Stage 1 Result（第一阶段结果）
+
+Version aligned to 0.2.0, committed, and pushed. First GitHub CI run **FAILED**.
+
+Root cause（根因）: `pyproject.toml` declares `mcp>=2.0.0`, but all local validation ran against mcp **1.27.2**, which does not satisfy that constraint. CI resolved mcp **2.1.1**, where the low-level `Server` API used by the adapter does not exist: `AttributeError: 'Server' object has no attribute 'list_tools'`.
+
+This is **not** a pure CI or environment fault. The declared dependency surface was never validated, and a consumer installing per this metadata would receive a non-functional server. Resolving it requires either narrowing the declared constraint to the validated 1.x line, or migrating the server adapter to the 2.x low-level API and revalidating schema fidelity. Both need a human decision.
+
+No tag, release, or publish was performed.
+
+## Stage 2 Result（第二阶段结果）
+
+Human Decision（人工决策） approved MCP SDK Dependency Alignment and MCP 2.x Output Schema Normalization on 2026-08-29.
+
+Implemented（已实现）:
+
+- `pyproject.toml` now declares `mcp>=2.1,<3`; package version stays `0.2.0`.
+- `src/mcp_ess_proposal/server.py` uses MCP 2.x low-level `add_request_handler` for `tools/list` and `tools/call`.
+- Runtime discovery uses MCP 2.x `input_schema` / `output_schema` fields.
+- Output schema normalization is limited to top-level `type: "object"` over the accepted `oneOf` success/error branches.
+- `docs/contracts/AMENDMENT-0002-mcp-2-output-schema-normalization.md` records the approved normalization and Contract Fidelity split.
+
+Validation（验证）:
+
+- Python 3.11 clean environment with `mcp 2.1.1`: PASS.
+- Package install with dev dependencies: PASS.
+- Full tests: PASS, 58 tests.
+- Schema semantic-equivalence and payload validation: PASS.
+- MCP 2.1.1 `tools/list` / `tools/call` over stdio: PASS.
+- Wheel/sdist build: PASS.
+- Fresh wheel install smoke with `mcp 2.1.1`: PASS.
+- Installed-wheel stdio smoke for `600 kWh + tariff 0.60`: PASS.
+- Installed-wheel stdio smoke for inconsistent consumption input: PASS, `INCONSISTENT_CONSUMPTION_INPUT`.
+- Release Safety Gate: PASS.
+
+Blocked（阻塞）:
+
+- True Claude Code Host E2E did not execute. `claude auth status` reports `loggedIn: false` and `authMethod: none`; `claude -p` returns API 403 before any MCP tool call. The old MCP 1.27.2 Host E2E is not used as final Release Evidence（发布证据）.
+
 ## Next Required Action
 
-STOP（停止） at Publish Approval（发布审批）.
-
-Version decision（版本决策）, 2026-08-29: the first public version is **0.2.0**. Package version, contract version, git tag, and release version are kept aligned, and `0.1.0` is not used because Core v0.2 carries changes a strict Core v0.1 consumer can observe.
+Commit and push the MCP 2.x dependency-alignment fix to trigger GitHub CI rerun. Do not restore Release Candidate Ready until GitHub CI passes and true Claude Host E2E is rerun under MCP 2.x with an authenticated Claude host. No git tag, GitHub Release, registry publish, or public announcement is authorized.

@@ -37,10 +37,10 @@ class McpStdioRuntimeTests(unittest.TestCase):
         tools, result = asyncio.run(call_stdio_server())
 
         self.assertEqual([tool.name for tool in tools.tools], [TOOL_NAME])
-        self.assertFalse(result.isError)
-        self.assertEqual(result.structuredContent["status"], "ok")
+        self.assertFalse(result.is_error)
+        self.assertEqual(result.structured_content["status"], "ok")
         self.assertEqual(
-            result.structuredContent["assumptions"]["calculation_method"],
+            result.structured_content["assumptions"]["calculation_method"],
             "deterministic-v0",
         )
 

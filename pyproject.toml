@@ -8,7 +8,7 @@ license = { text = "MIT" }
 authors = []
 keywords = ["mcp", "energy-storage", "solar", "proposal", "deterministic-calculation"]
 dependencies = [
-    "mcp>=2.0.0",
+    "mcp>=2.1,<3",
 ]
 
 [project.optional-dependencies]

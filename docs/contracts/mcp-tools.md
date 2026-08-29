@@ -2,7 +2,10 @@
 
 Status: Accepted for Core v0.2
 
-Amended by: `docs/contracts/AMENDMENT-0001-generate-ess-proposal-consumption-and-tariff.md` (Accepted 2026-08-29)
+Amended by:
+
+- `docs/contracts/AMENDMENT-0001-generate-ess-proposal-consumption-and-tariff.md` (Accepted 2026-08-29)
+- `docs/contracts/AMENDMENT-0002-mcp-2-output-schema-normalization.md` (Accepted 2026-08-29)
 
 Date: 2026-08-29
 

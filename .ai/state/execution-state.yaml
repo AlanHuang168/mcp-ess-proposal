@@ -16,7 +16,10 @@ active_artifacts:
   plan: docs/plan/PLAN-0003-contract-v0-2-implementation.md
   contract: docs/contracts/mcp-tools.md
   contract_version: Core v0.2
-  contract_amendment: docs/contracts/AMENDMENT-0001-generate-ess-proposal-consumption-and-tariff.md
+  contract_amendment: docs/contracts/AMENDMENT-0002-mcp-2-output-schema-normalization.md
+  contract_amendments:
+    - docs/contracts/AMENDMENT-0001-generate-ess-proposal-consumption-and-tariff.md
+    - docs/contracts/AMENDMENT-0002-mcp-2-output-schema-normalization.md
 contract_drift:
   type: contract_drift
   detected_by: claude_code_mcp_host_e2e
@@ -66,9 +69,9 @@ plan_approval:
     - harness_gaps: observation_only_append
     - harness_source: not_modified
 current_task:
-  id: RELEASE_CANDIDATE_READY
-  name: Awaiting Publish Approval
-  status: PENDING_HUMAN_APPROVAL
+  id: MCP_SDK_2_DEPENDENCY_ALIGNMENT
+  name: MCP SDK 2.x Dependency Alignment
+  status: BLOCKED_EXTERNAL_HOST_AUTH
   checkpoint: null
 adr_decisions:
   adr: ADR-0002
@@ -97,14 +100,17 @@ adr_decisions:
       included_after_sanitization:
         - .ai/state/**
 release:
-  stage: RELEASE_CANDIDATE_READY
+  stage: BLOCKED_CLAUDE_HOST_AUTH_PENDING_CI_RERUN
   package_version: 0.2.0
   contract_version: Core v0.2
   baseline_files: 47
-  first_tracked_baseline: committed_locally
+  first_tracked_baseline: pushed
+  repository: AlanHuang168/mcp-ess-proposal
+  repository_visibility: private
+  pushed_commit: 34a179f01fbfa825a78125e8a24e6ba7b7de9ca1
+  ci_result: FAILURE
   authorized_up_to: release_candidate_ready
   not_authorized:
-    - git push
     - GitHub Release
     - package registry publish
     - public announcement
@@ -347,7 +353,60 @@ validation_summary:
       - Release Preparation implementation
       - CI creation
       - final baseline secret review
+dependency_drift:
+  type: dependency_declaration_drift
+  detected_by: first GitHub CI run, 2026-08-29
+  summary: >-
+    pyproject declares mcp>=2.0.0, but every local validation ran against mcp
+    1.27.2, which does not satisfy that constraint. CI resolved mcp 2.1.1 and the
+    low-level Server API used by the adapter does not exist there.
+  ci_error: "AttributeError: 'Server' object has no attribute 'list_tools'"
+  validated_sdk: 1.27.2
+  declared_constraint: ">=2.0.0"
+  ci_resolved_sdk: 2.1.1
+  impact: >-
+    A consumer installing this package per its own metadata receives a
+    non-functional server. The declared dependency surface was never validated.
+  classification: not_a_pure_ci_config_issue
+  options_requiring_human_decision:
+    - narrow the declared constraint to the validated 1.x line, which ships a
+      package incompatible with the current MCP SDK major version
+    - migrate the server adapter to the mcp 2.x low-level API, which is a code
+      change at the MCP boundary and needs full schema-fidelity revalidation
+  related_gap: GAP-014 validation environment provenance
+  resolution:
+    human_decisions:
+      - >-
+        Migrate MCP Server Adapter to MCP SDK 2.x low-level API and constrain
+        dependency to mcp>=2.1,<3.
+      - >-
+        Permit only top-level type: object output schema normalization required
+        by MCP 2.1.1 tools/list; success and error branches remain unchanged.
+    implemented:
+      - pyproject dependency constrained to mcp>=2.1,<3.
+      - src/mcp_ess_proposal/server.py uses add_request_handler for tools/list and tools/call.
+      - Runtime discovery output schema adds only root type: object over the accepted oneOf branches.
+      - CONTRACT AMENDMENT-0002 records the normalization rule and fidelity split.
+    executed_tests:
+      - Python 3.11 clean environment installed mcp 2.1.1 and package dev dependencies.
+      - python -m compileall src tests PASS.
+      - python -m unittest discover -s tests PASS, 58 tests.
+      - targeted schema semantic-equivalence and payload validation tests PASS.
+      - stdio ClientSession tools/list and tools/call tests PASS.
+      - wheel and sdist build PASS.
+      - fresh wheel install with mcp 2.1.1 PASS.
+      - installed-wheel stdio smoke for 600 kWh plus tariff 0.60 and inconsistent input PASS.
+      - release safety gate PASS.
+    blocked:
+      - >-
+        Claude Code Host E2E could not run because local Claude auth is absent:
+        claude auth status reports loggedIn false / authMethod none, and claude -p
+        returns API 403 before any MCP tool call.
+    not_run:
+      - Claude Host E2E on MCP 2.x, blocked by host authentication.
+      - GitHub CI rerun result, pending push / remote status check.
 recommended_next_action: >-
-  STOP at Publish Approval. Contract v0.2 is implemented and validated, the release
-  safety gate passes, and the first tracked baseline is committed locally. No push,
-  release, or publish has been performed.
+  Commit and push the MCP 2.x dependency-alignment fix to trigger GitHub CI.
+  Do not mark Release Candidate Ready until GitHub CI passes and true Claude
+  Host E2E is rerun under MCP 2.x with a logged-in Claude host. No tag, release,
+  registry publish, or public announcement is authorized.

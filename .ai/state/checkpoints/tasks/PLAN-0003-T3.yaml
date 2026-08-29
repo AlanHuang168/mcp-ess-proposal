@@ -1,0 +1,25 @@
+task_id: PLAN-0003-T3
+task_name: Server Schema Fidelity
+plan: docs/plan/PLAN-0003-contract-v0-2-implementation.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  accepted_adr: docs/adr/ADR-0002-open-source-governance-artifact-boundary.md
+  approved_plan: docs/plan/PLAN-0003-contract-v0-2-implementation.md
+  accepted_contract_amendment: docs/contracts/AMENDMENT-0001-generate-ess-proposal-consumption-and-tariff.md
+  plan_approval: human_decision_2026-08-29_continuous_execution
+validation_environment:
+  interpreter: /usr/local/bin/python3.14
+  interpreter_version: "3.14.6"
+  build_interpreter: /usr/local/bin/python3.11
+  scan_locale: en_US.UTF-8
+changed_files:
+  - src/mcp_ess_proposal/server.py
+validation:
+  executed_tests:
+    - runtime discovery schema compared field by field against the contract document (GAP-011)
+    - input, output.ok, output.error, financial, and error enum all identical
+result:
+  summary: "PLAN-0003 T3 completed and validated."
+  next_ready_task: PLAN-0003-T4

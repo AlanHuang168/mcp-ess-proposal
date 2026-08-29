@@ -1,0 +1,21 @@
+{
+  "residential_tiers": [
+    { "upto_kwh": 200, "rate_myr_per_kwh": 0.218 },
+    { "upto_kwh": 300, "rate_myr_per_kwh": 0.334 },
+    { "upto_kwh": 600, "rate_myr_per_kwh": 0.516 },
+    { "upto_kwh": 900, "rate_myr_per_kwh": 0.546 },
+    { "upto_kwh": null, "rate_myr_per_kwh": 0.571 }
+  ],
+  "fallback_residential_tariff": 0.45,
+  "fallback_non_residential_tariff": 0.5,
+  "annual_yield_per_kwp": 1350,
+  "coverage_ratio": 0.7,
+  "min_kwp": 3.0,
+  "max_kwp": 15.0,
+  "cost_per_kwp_myr": 4500,
+  "default_storage_hours": 1.8,
+  "disclaimer": "This result is a preliminary deterministic estimate for planning only. It is not a formal quotation, investment advice, or utility tariff guarantee.",
+  "data_confidence_notes": [
+    "Default tariff and cost assumptions are neutral sample values for validation."
+  ]
+}

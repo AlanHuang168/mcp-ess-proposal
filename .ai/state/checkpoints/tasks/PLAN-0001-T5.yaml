@@ -1,0 +1,38 @@
+task_id: PLAN-0001-T5
+task_name: Implement MCP Server Adapter
+plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  accepted_adr: docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md
+  approved_plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+  accepted_contract: docs/contracts/mcp-tools.md
+changed_files:
+  - README.md
+  - src/mcp_ess_proposal/__main__.py
+  - src/mcp_ess_proposal/server.py
+  - tests/test_server.py
+  - tests/test_stdio_runtime.py
+  - .ai/state/execution-state.yaml
+  - .ai/state/checkpoints/tasks/PLAN-0001-T5.yaml
+  - docs/handoff/HANDOFF-current.md
+  - docs/project/PROJECT.md
+  - docs/harness/HARNESS-GAPS.md
+validation:
+  executed_tests:
+    - python3 -m compileall src tests
+    - PYTHONPATH=src python3 -m unittest discover -s tests
+    - MCP stdio runtime smoke through ClientSession and StdioServerParameters
+  code_path_review:
+    - Low-level MCP Server registration exposes only generate_ess_proposal.
+    - Tool handler remains a thin adapter from MCP arguments to Core generate_ess_proposal.
+    - Core modules calculator, models, data, and fixtures do not import MCP SDK.
+    - Source and tests were checked for excluded tools, private brand, provider, database, OCR, LLM, lead, CRM, and upload coupling.
+  not_run:
+    - remote HTTP transport tests
+    - authentication tests
+    - build/package distribution
+result:
+  summary: "MCP stdio Server Adapter implemented with explicit accepted schemas, one registered Core v0 tool, and thin handler delegation to deterministic Core."
+  next_ready_task: PLAN-0001-T6

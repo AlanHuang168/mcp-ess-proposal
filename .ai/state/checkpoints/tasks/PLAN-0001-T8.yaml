@@ -1,0 +1,45 @@
+task_id: PLAN-0001-T8
+task_name: Final Validation And Diff Review
+plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  accepted_adr: docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md
+  approved_plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+  accepted_contract: docs/contracts/mcp-tools.md
+changed_files:
+  - docs/project/PROJECT.md
+  - docs/handoff/HANDOFF-current.md
+  - .ai/state/execution-state.yaml
+  - .ai/state/checkpoints/tasks/PLAN-0001-T8.yaml
+validation:
+  executed_tests:
+    - python3 -m compileall src tests
+    - PYTHONPATH=src python3 -m unittest discover -s tests
+    - python3 MCP stdio runtime smoke from source checkout
+    - python3 MCP stdio runtime smoke from installed wheel target
+    - /usr/local/bin/python3.11 -m pip wheel . --no-deps --no-build-isolation
+    - /usr/local/bin/python3.11 -m pip install built wheel --no-deps --target /private/tmp/mcp-ess-proposal-install
+    - installed package metadata and package fixture load check
+    - pyproject metadata parse with tomllib
+    - runtime tool discovery schema introspection
+    - wheel content inspection for bundled fixtures and entry point metadata
+    - secret-safe grep for forbidden provider/database/private coupling
+    - git ls-files .env .env.example
+    - git check-ignore -v .env .env.local .env.example
+    - git status --short --untracked-files=all
+    - git diff --stat
+  code_path_review:
+    - README, Project Context, System Map, Handoff, Runtime State, and checkpoints are consistent with the current implementation.
+    - Runtime tool inventory exposes only generate_ess_proposal.
+    - Core remains deterministic, side-effect free, zero-secret, and free of MCP SDK dependencies outside the server adapter.
+    - Private brand, provider, database, CRM, Lead, OCR, LLM, prompt, upload, and JSONL runtime paths were not introduced.
+  not_run:
+    - full dependency install from package index
+    - remote HTTP transport tests
+    - authentication tests
+    - GitHub publication
+result:
+  summary: "PLAN-0001 implementation slice passed final validation and diff review and is ready for human final review."
+  next_ready_task: null

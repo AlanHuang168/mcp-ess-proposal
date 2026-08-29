@@ -1,0 +1,27 @@
+task_id: PLAN-0001-T1
+task_name: Establish MCP Tool Contract
+plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  source_tool_file: <PRIVATE_SOURCE_ROOT>/mcp_server.py
+  accepted_adr: docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md
+  approved_plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+changed_files:
+  - docs/contracts/mcp-tools.md
+  - docs/project/PROJECT.md
+  - docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+validation:
+  executed_tests: []
+  code_path_review:
+    - MCP tool inventory checked from source evidence.
+    - Contract checklist checked against .ai/rules/api-contract.md.
+  not_run:
+    - MCP runtime tests
+    - build
+    - typecheck
+    - full secret scan
+result:
+  summary: "Core v0 MCP Tool Contract created; only generate_ess_proposal is public, side-effect-free Core tool."
+  next_ready_task: PLAN-0001-T2

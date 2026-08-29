@@ -1,0 +1,37 @@
+task_id: PLAN-0001-T2
+task_name: Create Open-Source Project Scaffold
+plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  accepted_adr: docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md
+  approved_plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+  accepted_contract: docs/contracts/mcp-tools.md
+changed_files:
+  - pyproject.toml
+  - README.md
+  - .gitignore
+  - .env.example
+  - src/mcp_ess_proposal/__init__.py
+  - src/mcp_ess_proposal/__main__.py
+  - tests/.gitkeep
+  - .ai/state/execution-state.yaml
+  - docs/handoff/HANDOFF-current.md
+  - docs/project/PROJECT.md
+validation:
+  executed_tests:
+    - python3 -m compileall src
+    - pyproject parsed with python tomllib
+  code_path_review:
+    - Package metadata includes mcp dependency only for runtime Core and pytest as dev extra.
+    - Scaffold excludes FastAPI, psycopg, OpenAI, dotenv, OCR, LLM, upload, CRM, and database integration dependencies.
+    - .gitignore excludes secret-bearing env files while allowing .env.example.
+  not_run:
+    - dependency install
+    - MCP runtime tests
+    - unit tests
+    - build/package distribution
+result:
+  summary: "Open-source package scaffold created without private brand, lead, CRM, database, provider, OCR, or LLM runtime coupling."
+  next_ready_task: PLAN-0001-T3

@@ -1,0 +1,36 @@
+task_id: PLAN-0001-T3
+task_name: Extract Deterministic Calculation Core
+plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  source_service_file: <PRIVATE_SOURCE_ROOT>/service.py
+  source_model_file: <PRIVATE_SOURCE_ROOT>/models.py
+  accepted_adr: docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md
+  approved_plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+  accepted_contract: docs/contracts/mcp-tools.md
+changed_files:
+  - src/mcp_ess_proposal/__init__.py
+  - src/mcp_ess_proposal/data.py
+  - src/mcp_ess_proposal/models.py
+  - src/mcp_ess_proposal/calculator.py
+  - tests/test_calculator.py
+  - .ai/state/execution-state.yaml
+  - docs/handoff/HANDOFF-current.md
+  - docs/project/PROJECT.md
+validation:
+  executed_tests:
+    - python3 -m compileall src tests
+    - PYTHONPATH=src python3 -m unittest discover -s tests
+  code_path_review:
+    - Core output shape checked against docs/contracts/mcp-tools.md.
+    - Core source excludes provider calls, DB writes, file writes, OCR, LLM, Lead, CRM, and brand coupling.
+    - Unit tests cover monthly bill input, monthly kWh input, residential tariff, budget cap, backup request, storage keyword, missing consumption input, extra field rejection, and strict numeric / boolean validation.
+  not_run:
+    - MCP runtime tests
+    - dependency install
+    - build/package distribution
+result:
+  summary: "Deterministic domain logic migrated into neutral Core modules with contract-shaped outputs and failure-path tests."
+  next_ready_task: PLAN-0001-T4

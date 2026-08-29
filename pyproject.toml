@@ -1,0 +1,33 @@
+[project]
+name = "mcp-ess-proposal"
+version = "0.1.0"
+description = "Open-source MCP server for deterministic energy storage proposal calculations"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = []
+keywords = ["mcp", "energy-storage", "solar", "proposal", "deterministic-calculation"]
+dependencies = [
+    "mcp>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+mcp-ess-proposal = "mcp_ess_proposal.__main__:main"
+
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+mcp_ess_proposal = ["fixtures/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

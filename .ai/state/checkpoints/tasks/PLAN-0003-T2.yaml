@@ -1,0 +1,26 @@
+task_id: PLAN-0003-T2
+task_name: Core Implementation
+plan: docs/plan/PLAN-0003-contract-v0-2-implementation.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  accepted_adr: docs/adr/ADR-0002-open-source-governance-artifact-boundary.md
+  approved_plan: docs/plan/PLAN-0003-contract-v0-2-implementation.md
+  accepted_contract_amendment: docs/contracts/AMENDMENT-0001-generate-ess-proposal-consumption-and-tariff.md
+  plan_approval: human_decision_2026-08-29_continuous_execution
+validation_environment:
+  interpreter: /usr/local/bin/python3.14
+  interpreter_version: "3.14.6"
+  build_interpreter: /usr/local/bin/python3.11
+  scan_locale: en_US.UTF-8
+changed_files:
+  - src/mcp_ess_proposal/models.py
+  - src/mcp_ess_proposal/calculator.py
+validation:
+  executed_tests:
+    - PYTHONPATH=src python3.14 -m unittest discover -s tests
+    - deterministic reproduction of E1 through E5 before and after the fix
+result:
+  summary: "PLAN-0003 T2 completed and validated."
+  next_ready_task: PLAN-0003-T3

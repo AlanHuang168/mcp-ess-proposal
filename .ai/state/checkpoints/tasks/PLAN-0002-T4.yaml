@@ -1,0 +1,88 @@
+task_id: PLAN-0002-T4
+task_name: First Tracked Baseline Secret And Private-Data Review
+plan: docs/plan/PLAN-0002-release-preparation.md
+status: ESCALATED
+lifecycle: INTERRUPTED
+updated_at: "2026-08-29"
+escalation:
+  trigger: secret_private_data_review_anomaly
+  stop_condition: approved_stop_condition_secret_private_data_review
+  requires: human_decision
+  reason: >-
+    No secret value exists anywhere in the repository, but private-system internal
+    detail is present in governance documents and would be published by the first
+    tracked baseline and any later open-source release. Remediation would require
+    editing an Accepted ADR, which the IMPL workflow forbids without escalation.
+reality_anchor:
+  accepted_adr: docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md
+  approved_plan: docs/plan/PLAN-0002-release-preparation.md
+  accepted_contract: docs/contracts/mcp-tools.md
+  plan_approval: human_approval_2026-08-29
+  repository_state: no_commits_all_files_untracked
+validation_environment:
+  interpreter: /usr/local/bin/python3.14
+  interpreter_version: "3.14.6"
+  scan_locale: en_US.UTF-8
+  scan_note: >-
+    Grep scans must run under a UTF-8 locale and must check exit codes. Under the
+    default empty LANG, a multibyte pattern makes BSD grep exit 2, which a naive
+    "|| echo clean" pattern reports as a false clean result.
+changed_files:
+  - docs/harness/HARNESS-GAPS.md
+  - .ai/state/execution-state.yaml
+  - .ai/state/checkpoints/tasks/PLAN-0002-T4.yaml
+validation:
+  executed_tests:
+    - git status --short --untracked-files=all
+    - git ls-files .env .env.example
+    - git check-ignore -v .env .env.local .env.example
+    - filesystem check for .env and .env.local presence
+    - secret value scan for provider keys, tokens, private key blocks, and high-entropy literals
+    - database URL and connection string scan
+    - private brand and private local path scan across all 60 untracked files
+    - environment assignment scan for KEY=VALUE literals
+    - private source project modification check by mtime and by read-only git status
+  results:
+    - status: PASS
+      item: no secret values
+      detail: >-
+        No API key, token, credential, private key block, connection string, or
+        high-entropy literal exists in any file in the baseline scope.
+    - status: PASS
+      item: env ignore behavior
+      detail: >-
+        .env and .env.local are ignored, .env.example is un-ignored by negation and
+        declares no variables. No .env file exists in this repository.
+    - status: PASS
+      item: runtime and test code cleanliness
+      detail: >-
+        The only private-name match in code is tests/test_configuration.py line 35,
+        which deliberately splits forbidden names so the literals never appear. It is
+        a negative test asserting the old private settings are absent, and is correct.
+    - status: PASS
+      item: private source project untouched
+      detail: >-
+        The private source tool has uncommitted changes dated 2026-08-15 and
+        2026-08-18, predating this migration phase. Nothing under it was modified
+        during this session.
+    - status: FAIL
+      item: private internal detail in governance documents
+      detail: >-
+        16 occurrences of absolute developer filesystem paths disclose the developer
+        account name and the private platform directory layout. Governance documents
+        additionally describe private internal architecture: private environment
+        variable names, a private database table name, and private runtime file paths.
+        These are not secrets, but publishing them was never an accepted decision.
+  code_path_review:
+    - Runtime source, fixtures, packaging metadata, LICENSE, CI workflow, and README are free of private coupling.
+    - The exposure is confined to docs/ governance artifacts and .ai/ recovery state, not to shipped code.
+    - ADR-0001 excluded private detail from Core, but no decision was ever recorded about publishing the governance record itself.
+  not_run:
+    - git add and first tracked baseline commit, intentionally not executed pending human decision
+    - PLAN-0002-T5 Release Preparation Closeout
+result:
+  summary: >-
+    Secret review passed with zero secret values, but private-data review failed on
+    governance documents that would publish private internal detail at the first
+    tracked baseline. Task escalated for human decision before any git add.
+  next_ready_task: null

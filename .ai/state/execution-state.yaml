@@ -1,0 +1,348 @@
+version: 2
+updated_at: "2026-08-29"
+workflow: IMPL
+project_context:
+  directory: docs/project
+  entry: docs/project/PROJECT.md
+  governing_contract: docs/harness/PROJECT-CONTEXT-CONTRACT.md
+  authoritative_location: docs/project
+  contract_status: missing_in_repository
+active_artifacts:
+  prd: null
+  adr: docs/adr/ADR-0002-open-source-governance-artifact-boundary.md
+  adr_accepted:
+    - docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md
+    - docs/adr/ADR-0002-open-source-governance-artifact-boundary.md
+  plan: docs/plan/PLAN-0003-contract-v0-2-implementation.md
+  contract: docs/contracts/mcp-tools.md
+  contract_version: Core v0.2
+  contract_amendment: docs/contracts/AMENDMENT-0001-generate-ess-proposal-consumption-and-tariff.md
+contract_drift:
+  type: contract_drift
+  detected_by: claude_code_mcp_host_e2e
+  detected_at: "2026-08-29"
+  tool: generate_ess_proposal
+  accepted_contract: docs/contracts/mcp-tools.md
+  amendment: docs/contracts/AMENDMENT-0001-generate-ess-proposal-consumption-and-tariff.md
+  amendment_status: ACCEPTED_2026-08-29
+  routed_to: PLAN
+  routing_reason: >-
+    Additive optional input is permitted by the accepted contract compatibility note.
+    No ADR trigger is met: no boundary, ownership, provider, auth, or infrastructure
+    change. The semantic precedence change has compatibility impact and needs explicit
+    scope and migration planning, which is PLAN work.
+  evidence:
+    - E1 user-supplied tariff rejected as unsupported field; default resolves to 0.386
+    - E2 both consumption inputs yield 776.5 kWh, matching neither input
+    - E3 precedence differs between residential and non-residential
+    - E4 non-residential bill conversion uses the residential fallback tariff
+    - E5 financial investment figure is PV-only but carries no scope marker
+  evidence_kind: executed_test
+  decided_parameters:
+    consistency_tolerance: 0.10
+    out_of_tolerance_behaviour: error
+    error_code: INCONSISTENT_CONSUMPTION_INPUT
+  resolution: implemented and validated under PLAN-0003
+drift:
+  type: architecture_drift
+  detected_by: PLAN-0002-T4
+  detected_at: "2026-08-29"
+  summary: >-
+    ADR-0001 scoped its open-source boundary to Source Code only and never decided
+    the publication boundary for Governance Artifacts or the ownership of
+    installer-managed Harness Runtime. The pre-baseline review found private
+    internal detail in 13 governance and state files.
+  routed_to: ADR
+  amendment: docs/adr/ADR-0002-open-source-governance-artifact-boundary.md
+plan_approval:
+  plan: PLAN-0002
+  status: APPROVED
+  approved_at: "2026-08-29"
+  approved_by: human_project_owner
+  approved_scope: PLAN-0002-T1 through PLAN-0002-T5, consecutive execution
+  confirmed_decisions:
+    - mit_license_holder: neutral_personal_copyright_text
+    - ci_python_versions: ["3.11"]
+    - harness_gaps: observation_only_append
+    - harness_source: not_modified
+current_task:
+  id: RELEASE_CANDIDATE_READY
+  name: Awaiting Publish Approval
+  status: PENDING_HUMAN_APPROVAL
+  checkpoint: null
+adr_decisions:
+  adr: ADR-0002
+  document_status: Accepted
+  accepted_at: "2026-08-29"
+  decisions:
+    - id: D1
+      name: Governance Artifact Boundary
+      outcome: ACCEPTED
+    - id: D2
+      name: Open-Source Sanitization
+      outcome: ACCEPTED
+    - id: D3
+      name: Release Safety Gate
+      outcome: ACCEPTED
+    - id: D4
+      name: Harness Runtime Ownership And Licensing
+      outcome: ACCEPTED
+      policy: consumer_side_minimal_redistribution
+      excluded_from_baseline:
+        - AGENTS.md
+        - .ai/rules/**
+        - .ai/roles/**
+        - .ai/workflows/**
+        - .ai/VERSION
+      included_after_sanitization:
+        - .ai/state/**
+release:
+  stage: RELEASE_CANDIDATE_READY
+  package_version: 0.1.0
+  contract_version: Core v0.2
+  baseline_files: 47
+  first_tracked_baseline: committed_locally
+  authorized_up_to: release_candidate_ready
+  not_authorized:
+    - git push
+    - GitHub Release
+    - package registry publish
+    - public announcement
+  open_decision:
+    - package version remains 0.1.0 while the contract moved to v0.2; confirm at publish approval
+completed_tasks:
+  - id: PLAN-0002-T1
+    status: COMPLETE
+  - id: PLAN-0002-T2
+    status: COMPLETE
+  - id: PLAN-0002-T3
+    status: COMPLETE
+  - id: PLAN-0002-T4
+    status: COMPLETE
+    note: resolved by ADR-0002 D1-D4 and executed as PLAN-0003-T8 and PLAN-0003-T9
+  - id: PLAN-0002-T5
+    status: SUPERSEDED_BY_PLAN-0003-T10
+  - id: PLAN-0003-T1
+    status: COMPLETE
+  - id: PLAN-0003-T2
+    status: COMPLETE
+  - id: PLAN-0003-T3
+    status: COMPLETE
+  - id: PLAN-0003-T4
+    status: COMPLETE
+  - id: PLAN-0003-T5
+    status: COMPLETE
+  - id: PLAN-0003-T6
+    status: COMPLETE
+  - id: PLAN-0003-T7
+    status: COMPLETE
+  - id: PLAN-0003-T8
+    status: COMPLETE
+  - id: PLAN-0003-T9
+    status: COMPLETE
+  - id: PLAN-0003-T10
+    status: COMPLETE
+task_sets:
+  ready: []
+  interrupted: []
+  blocked: []
+  escalated: []
+validation_summary:
+  PLAN-0001-T1:
+    executed_tests: []
+    code_path_review:
+      - docs/contracts/mcp-tools.md checked against API Contract Rules
+      - private-source-tool/mcp_server.py tool inventory reviewed
+    not_run:
+      - MCP runtime tests
+      - build
+      - typecheck
+      - full secret scan
+  PLAN-0001-T2:
+    executed_tests:
+      - python3 -m compileall src
+      - pyproject parsed with python tomllib
+    code_path_review:
+      - package metadata checked for deterministic MCP Core scope
+      - secret-safe grep checked scaffold files for excluded provider and database configuration
+    not_run:
+      - dependency install
+      - MCP runtime tests
+      - unit tests
+      - build/package distribution
+  PLAN-0001-T3:
+    executed_tests:
+      - python3 -m compileall src tests
+      - PYTHONPATH=src python3 -m unittest discover -s tests
+    code_path_review:
+      - deterministic calculation core checked against accepted MCP Tool Contract
+      - source and tests checked for excluded provider, database, OCR, LLM, Lead, CRM, and brand coupling
+    not_run:
+      - MCP runtime tests
+      - dependency install
+      - build/package distribution
+  PLAN-0001-T4:
+    executed_tests:
+      - python3 -m json.tool src/mcp_ess_proposal/fixtures/calculation-defaults.json
+      - python3 -m json.tool src/mcp_ess_proposal/fixtures/sample-products.json
+      - python3 -m compileall src tests
+      - PYTHONPATH=src python3 -m unittest discover -s tests
+      - pyproject package-data parsed with python tomllib
+    code_path_review:
+      - neutral fixtures checked for private brand, provider key, database, OCR, LLM, CRM, and lead coupling
+      - data loader checked for package-resource based fixture loading
+    not_run:
+      - MCP runtime tests
+      - dependency install
+      - build/package distribution
+  PLAN-0001-T5:
+    executed_tests:
+      - python3 -m compileall src tests
+      - PYTHONPATH=src python3 -m unittest discover -s tests
+      - MCP stdio runtime smoke through ClientSession and StdioServerParameters
+    code_path_review:
+      - MCP low-level Server registers only generate_ess_proposal
+      - Tool handler maps arguments to Core generate_ess_proposal and returns contract-shaped structured content
+      - Source and tests checked for excluded tools, private brand, provider, database, OCR, LLM, lead, CRM, and upload coupling
+    not_run:
+      - remote HTTP transport tests
+      - authentication tests
+      - build/package distribution
+  PLAN-0001-T6:
+    executed_tests:
+      - python3 -m compileall src tests
+      - PYTHONPATH=src python3 -m unittest discover -s tests
+      - secret-safe grep for forbidden provider/database config names and dotenv/env reads
+      - git ls-files .env .env.example
+      - git check-ignore -v .env .env.local .env.example
+    code_path_review:
+      - README Configuration section matches zero required runtime secrets
+      - .env.example declares no variables
+      - runtime source does not read environment configuration
+      - tests lock .env ignore behavior and absence of old private settings
+    not_run:
+      - remote HTTP transport tests
+      - authentication tests
+      - build/package distribution
+  PLAN-0001-T7:
+    executed_tests:
+      - python3 -m compileall src tests
+      - documentation grep for stale planned wording and task state markers
+      - secret-safe grep for forbidden provider/database config names and dotenv/env reads
+      - scope-drift grep for excluded runtime capabilities
+    code_path_review:
+      - README checked for project purpose, non-goals, tool contract, data assumptions, configuration, runtime path, and validation commands
+      - Project Context and System Map checked against current implementation
+      - Handoff, execution state, and checkpoint synchronized with Task 7 completion
+      - Harness Documentation Language Policy recorded as an observation-only gap
+    not_run:
+      - final build/package distribution
+      - release or GitHub publication
+  PLAN-0001-T8:
+    executed_tests:
+      - python3 -m compileall src tests
+      - PYTHONPATH=src python3 -m unittest discover -s tests
+      - python3 MCP stdio runtime smoke from source checkout
+      - python3 MCP stdio runtime smoke from installed wheel target
+      - /usr/local/bin/python3.11 -m pip wheel . --no-deps --no-build-isolation
+      - /usr/local/bin/python3.11 -m pip install built wheel --no-deps --target /private/tmp/mcp-ess-proposal-install
+      - installed package metadata and package fixture load check
+      - pyproject metadata parse with tomllib
+      - runtime tool discovery schema introspection
+      - wheel content inspection for bundled fixtures and entry point metadata
+      - secret-safe grep for forbidden provider/database/private coupling
+      - git ls-files .env .env.example
+      - git check-ignore -v .env .env.local .env.example
+      - git status --short --untracked-files=all
+      - git diff --stat
+    code_path_review:
+      - README, Project Context, System Map, Handoff, Runtime State, and checkpoints checked for consistency
+      - server exposes only generate_ess_proposal
+      - Core remains deterministic, side-effect free, MCP-SDK-decoupled, and zero-secret
+      - private the private platform, Lead, CRM, DB, OCR, LLM, provider, prompt, upload, and JSONL runtime paths are excluded from runtime code
+    not_run:
+      - full dependency install from package index
+      - remote HTTP transport tests
+      - authentication tests
+      - GitHub publication
+  PLAN-0002-T1:
+    executed_tests:
+      - LICENSE file existence check
+      - grep pyproject.toml license metadata for MIT consistency
+      - private brand grep over LICENSE
+      - find over src and tests confirming no runtime or source change
+      - PYTHONPATH=src /usr/local/bin/python3.14 -m unittest discover -s tests
+    code_path_review:
+      - LICENSE uses standard MIT text with Neutral Personal Copyright Text and no corporate entity
+      - pyproject MIT metadata unchanged and consistent with LICENSE
+    not_run:
+      - README license section, deferred to PLAN-0002-T3
+      - package build validation, deferred to PLAN-0002-T5
+  PLAN-0002-T2:
+    executed_tests:
+      - workflow YAML parsed with python yaml.safe_load
+      - workflow permission and secret scan
+      - workflow private brand and excluded capability scan
+      - /usr/local/bin/python3.11 -m compileall src tests
+      - /usr/local/bin/python3.11 -m pip wheel . --no-deps --no-build-isolation
+      - installed wheel fixture listing matching the CI verification step
+      - PYTHONPATH=src /usr/local/bin/python3.14 -m unittest discover -s tests
+    code_path_review:
+      - single test-only job, permissions contents read, no deploy/publish/secret scope
+      - CI steps mirror existing local validation
+      - Python matrix is 3.11 only per approved decision
+    blocked:
+      - "python3.11 -m unittest discover: mcp SDK absent for python3.11 in this workspace"
+    not_run:
+      - GitHub Actions execution of the workflow
+      - full dependency install from package index
+  PLAN-0002-T3:
+    executed_tests:
+      - scope-drift grep over README for excluded capabilities
+      - private brand grep over README
+      - invented repository URL and badge grep
+      - markdown link target existence check
+      - README tool inventory compared against accepted contract and server TOOL_NAME
+    code_path_review:
+      - Release Candidate status stated without claiming publication or tag
+      - excluded capabilities appear only as non-goals
+      - license, CI, and support boundary sections match T1 and T2 output
+    not_run:
+      - GitHub rendering verification of README
+  PLAN-0002-T4:
+    executed_tests:
+      - git status --short --untracked-files=all
+      - git ls-files .env .env.example
+      - git check-ignore -v .env .env.local .env.example
+      - secret value scan for keys, tokens, private key blocks, high-entropy literals
+      - database URL and connection string scan
+      - private brand and private local path scan across all 60 baseline files
+      - private source project modification check by mtime and read-only git status
+    results:
+      - PASS no secret values anywhere in baseline scope
+      - PASS env ignore behavior and absent .env
+      - PASS runtime and test code free of private coupling
+      - PASS private source project untouched by this phase
+      - FAIL private internal detail present in governance documents
+    code_path_review:
+      - exposure confined to docs/ governance artifacts and .ai/ recovery state, not shipped code
+      - remediation would require editing an Accepted ADR, which IMPL must not do unilaterally
+    not_run:
+      - git add and first tracked baseline commit, withheld pending human decision
+      - PLAN-0002-T5 Release Preparation Closeout
+  PLAN-0002:
+    executed_tests:
+      - Cross-Agent Recovery current reality check confirmed no LICENSE and no GitHub CI workflow
+      - PYTHONPATH=src /usr/local/bin/python3.14 -m unittest discover -s tests
+    code_path_review:
+      - Router selected PLAN for Release Preparation because work spans license, CI, README, package validation, secret review, and Harness state.
+      - Current reality checked: no LICENSE, no GitHub CI workflow, pyproject MIT metadata present, README needs open-source release information.
+      - Human Approval recorded in PLAN-0002 Approval Basis and in plan_approval.
+    not_run:
+      - Release Preparation implementation
+      - CI creation
+      - final baseline secret review
+recommended_next_action: >-
+  STOP at Publish Approval. Contract v0.2 is implemented and validated, the release
+  safety gate passes, and the first tracked baseline is committed locally. No push,
+  release, or publish has been performed.

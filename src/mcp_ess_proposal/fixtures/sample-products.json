@@ -1,0 +1,20 @@
+{
+  "products": [
+    {
+      "id": "sample-residential-battery-10",
+      "segment": "residential",
+      "kind": "battery",
+      "energy_kwh": 10,
+      "power_kw": 5,
+      "data_confidence": "sample"
+    },
+    {
+      "id": "sample-commercial-battery-100",
+      "segment": "commercial",
+      "kind": "battery",
+      "energy_kwh": 100,
+      "power_kw": 50,
+      "data_confidence": "sample"
+    }
+  ]
+}

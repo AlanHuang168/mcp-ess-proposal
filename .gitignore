@@ -1,0 +1,54 @@
+# Python-generated files
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+wheels/
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Runtime output
+uploads/
+logs/
+*.log
+*.jsonl
+
+# Test and tooling cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Harness Runtime（Harness 运行时）- ADR-0002 D4 Consumer-Side Minimal Redistribution Policy
+# ai-codeops-harness installer-managed artifacts are NOT redistributed by this
+# repository. Consumers who need them should run the ai-codeops-harness installer.
+# Project-generated Runtime Facts under .ai/state/** stay tracked.
+/AGENTS.md
+/.ai/VERSION
+/.ai/rules/
+/.ai/roles/
+/.ai/workflows/
+!/.ai/state/
+
+# Session screenshots（会话截图）- excluded from the public baseline.
+# Kept on disk as local Contract Drift Evidence. They are personal Claude Code
+# session captures, are referenced by no document, and cannot be scanned by the
+# text-based Release Safety Gate. Publishing them needs an explicit human decision.
+/imgs/

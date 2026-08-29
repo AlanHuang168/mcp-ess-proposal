@@ -1,0 +1,25 @@
+task_id: PLAN-0003-T5
+task_name: Runtime And Host Validation
+plan: docs/plan/PLAN-0003-contract-v0-2-implementation.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  accepted_adr: docs/adr/ADR-0002-open-source-governance-artifact-boundary.md
+  approved_plan: docs/plan/PLAN-0003-contract-v0-2-implementation.md
+  accepted_contract_amendment: docs/contracts/AMENDMENT-0001-generate-ess-proposal-consumption-and-tariff.md
+  plan_approval: human_decision_2026-08-29_continuous_execution
+validation_environment:
+  interpreter: /usr/local/bin/python3.14
+  interpreter_version: "3.14.6"
+  build_interpreter: /usr/local/bin/python3.11
+  scan_locale: en_US.UTF-8
+changed_files:
+  - tests/test_stdio_runtime_v0_2.py
+validation:
+  executed_tests:
+    - stdio MCP ClientSession round trip: initialize, list_tools, call_tool success and error
+    - real Claude Code Host end-to-end run through the registered MCP server
+result:
+  summary: "PLAN-0003 T5 completed and validated."
+  next_ready_task: PLAN-0003-T6

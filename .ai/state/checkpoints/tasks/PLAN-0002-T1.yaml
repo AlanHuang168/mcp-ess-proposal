@@ -1,0 +1,38 @@
+task_id: PLAN-0002-T1
+task_name: Add MIT License
+plan: docs/plan/PLAN-0002-release-preparation.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  accepted_adr: docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md
+  approved_plan: docs/plan/PLAN-0002-release-preparation.md
+  accepted_contract: docs/contracts/mcp-tools.md
+  plan_approval: human_approval_2026-08-29
+validation_environment:
+  interpreter: /usr/local/bin/python3.14
+  interpreter_version: "3.14.6"
+  note: "mcp SDK resolves only under python3.14 site-packages in this workspace; the default shell python3 is anaconda 3.13 without the mcp SDK."
+changed_files:
+  - LICENSE
+  - docs/plan/PLAN-0002-release-preparation.md
+  - docs/handoff/HANDOFF-current.md
+  - .ai/state/execution-state.yaml
+  - .ai/state/checkpoints/tasks/PLAN-0002-T1.yaml
+validation:
+  executed_tests:
+    - LICENSE file existence check
+    - grep pyproject.toml license metadata for MIT consistency
+    - private brand grep over LICENSE for the private platform/the partner platform/the partner platform strings
+    - find over src and tests confirming no runtime or source file changed during this task
+    - PYTHONPATH=src /usr/local/bin/python3.14 -m unittest discover -s tests
+  code_path_review:
+    - LICENSE uses standard MIT text with Neutral Personal Copyright Text and no corporate entity.
+    - pyproject.toml license metadata remains license = { text = "MIT" } and was not modified.
+    - No package code, MCP tool registration, or Tool Contract behavior was touched.
+  not_run:
+    - README license section, which belongs to PLAN-0002-T3
+    - package build validation, which belongs to PLAN-0002-T5
+result:
+  summary: "MIT LICENSE added with neutral personal copyright text; repository license files are consistent with pyproject MIT metadata and no runtime behavior changed."
+  next_ready_task: PLAN-0002-T2

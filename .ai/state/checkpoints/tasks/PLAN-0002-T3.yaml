@@ -1,0 +1,38 @@
+task_id: PLAN-0002-T3
+task_name: README Open-Source Completeness Review
+plan: docs/plan/PLAN-0002-release-preparation.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  accepted_adr: docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md
+  approved_plan: docs/plan/PLAN-0002-release-preparation.md
+  accepted_contract: docs/contracts/mcp-tools.md
+  plan_approval: human_approval_2026-08-29
+validation_environment:
+  interpreter: /usr/local/bin/python3.14
+  interpreter_version: "3.14.6"
+changed_files:
+  - README.md
+  - .ai/state/execution-state.yaml
+  - .ai/state/checkpoints/tasks/PLAN-0002-T3.yaml
+validation:
+  executed_tests:
+    - scope-drift grep over README for Remote HTTP, authentication, OCR, LLM, CRM, Lead, database, provider
+    - private brand grep over README for the private platform, the private platform, the partner platform, the partner platform, DashScope
+    - invented repository URL and badge grep for github.com, shields.io, badge, pypi.org
+    - markdown link target existence check for all README links
+    - README tool inventory compared against docs/contracts/mcp-tools.md Core v0 Public Tool Inventory
+    - README tool inventory compared against TOOL_NAME in src/mcp_ess_proposal/server.py
+  code_path_review:
+    - README states Release Candidate status without claiming a published package or tagged release.
+    - Excluded capabilities appear only as non-goals or unsupported items, never as available features.
+    - License section references the MIT LICENSE added in PLAN-0002-T1 and matches pyproject metadata.
+    - Continuous Integration section describes the test-only Python 3.11 workflow with read-only permissions and no secrets.
+    - Support Boundaries section adds no roadmap, feature promise, or future scope commitment.
+    - No repository-specific badge or URL was invented, because the public repository URL is still unknown.
+  not_run:
+    - GitHub rendering verification of README on a public repository
+result:
+  summary: "README is sufficient for a third-party reviewer of the V0.1 Release Candidate: license reference, CI description, release-candidate status, and support boundaries were added without introducing scope beyond Core v0."
+  next_ready_task: PLAN-0002-T4

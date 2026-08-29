@@ -1,0 +1,35 @@
+task_id: PLAN-0001-T7
+task_name: Documentation And Harness State Sync
+plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  accepted_adr: docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md
+  approved_plan: docs/plan/PLAN-0001-mcp-ess-open-source-migration.md
+  accepted_contract: docs/contracts/mcp-tools.md
+changed_files:
+  - README.md
+  - docs/project/PROJECT.md
+  - docs/project/SYSTEM-MAP.md
+  - docs/handoff/HANDOFF-current.md
+  - docs/harness/HARNESS-GAPS.md
+  - .ai/state/execution-state.yaml
+  - .ai/state/checkpoints/tasks/PLAN-0001-T7.yaml
+validation:
+  executed_tests:
+    - python3 -m compileall src tests
+    - documentation grep for stale planned wording and task state markers
+    - secret-safe grep for forbidden provider/database config names and dotenv/env reads
+    - scope-drift grep for excluded runtime capabilities
+  code_path_review:
+    - README explains project purpose, Core v0 scope, non-goals, configuration, data assumptions, runtime path, and validation commands.
+    - Project Context and System Map match the current stdio MCP server, deterministic Core, neutral fixtures, and zero-secret configuration.
+    - Handoff and Runtime State were synchronized to Task 7 completion.
+    - Documentation Language Policy was recorded only as a Harness gap.
+  not_run:
+    - final build/package distribution
+    - release or GitHub publication
+result:
+  summary: "Documentation and Harness runtime records now reflect the current Core v0 implementation through Task 7 without changing the MCP Tool Contract or adding MCP functionality."
+  next_ready_task: PLAN-0001-T8

@@ -1,0 +1,46 @@
+task_id: PLAN-0002-T2
+task_name: Add Minimal GitHub CI
+plan: docs/plan/PLAN-0002-release-preparation.md
+status: CLOSED
+lifecycle: CLOSED
+updated_at: "2026-08-29"
+reality_anchor:
+  accepted_adr: docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md
+  approved_plan: docs/plan/PLAN-0002-release-preparation.md
+  accepted_contract: docs/contracts/mcp-tools.md
+  plan_approval: human_approval_2026-08-29
+  approved_ci_matrix: ["3.11"]
+validation_environment:
+  interpreter: /usr/local/bin/python3.11
+  interpreter_version: "3.11.15"
+  secondary_interpreter: /usr/local/bin/python3.14
+  note: "mcp SDK is installed only under python3.14 in this workspace. Python 3.11 is the CI target version but has no local mcp SDK, so the 3.11 test step could not be executed locally."
+changed_files:
+  - .github/workflows/ci.yml
+  - .ai/state/execution-state.yaml
+  - .ai/state/checkpoints/tasks/PLAN-0002-T2.yaml
+validation:
+  executed_tests:
+    - workflow YAML parsed with python yaml.safe_load
+    - workflow permission and secret scan for secrets./GITHUB_TOKEN/PYPI/TWINE/token/deploy/publish/environment/id-token/write permissions
+    - workflow private brand and excluded capability scan
+    - /usr/local/bin/python3.11 -m compileall src tests
+    - /usr/local/bin/python3.11 -m pip wheel . --no-deps --no-build-isolation
+    - /usr/local/bin/python3.11 -m pip install --no-deps --target wheel-check built wheel
+    - installed wheel fixture listing through importlib.resources, matching the CI verification step
+    - PYTHONPATH=src /usr/local/bin/python3.14 -m unittest discover -s tests
+  code_path_review:
+    - Workflow declares a single test-only job with permissions contents read and no write, deploy, publish, release, or environment scope.
+    - CI steps mirror the existing local validation: compileall, unittest discover, distribution build, and installed-wheel package-data verification.
+    - Python version matrix is 3.11 only, matching the approved decision.
+    - Package import does not require the MCP SDK, so the no-deps wheel verification step is valid.
+  blocked:
+    - status: BLOCKED
+      item: "python3.11 -m unittest discover -s tests"
+      cause: "mcp SDK is not installed for python3.11 in this workspace and no package-index install was performed. Both errors are ModuleNotFoundError: No module named 'mcp'. The 19 SDK-independent tests pass under 3.11; all 26 tests pass under python3.14 where the SDK is present."
+  not_run:
+    - GitHub Actions execution of the workflow, which requires a GitHub remote and is outside this phase
+    - full dependency install from package index
+result:
+  summary: "Minimal test-only GitHub CI added for Python 3.11 with read-only permissions, no secrets, and no deploy or publish jobs; CI steps mirror local validation. The 3.11 test step is BLOCKED locally by the missing MCP SDK and remains unverified until the first CI run."
+  next_ready_task: PLAN-0002-T3

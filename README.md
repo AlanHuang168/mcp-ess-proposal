@@ -1,40 +1,40 @@
 # mcp-ess-proposal
 
-Open-source MCP Server（开源 MCP 服务） for deterministic solar and energy-storage proposal calculations.
+`mcp-ess-proposal` 是一个开源 MCP Server（开源 MCP 服务），用于从结构化输入生成确定性的太阳能与储能初步方案计算结果。
 
-## Status
+## 状态
 
-Version（版本）: **0.2.0**. MCP Tool Contract（MCP 工具契约）: **Core v0.2**.
+版本（Version）: **0.2.0**。MCP Tool Contract（MCP 工具契约）: **Core v0.2**。
 
-The package version tracks the tool contract version. The first public release is `0.2.0`, not `0.1.0`, because the Core v0.2 contract carries changes that a strict Core v0.1 consumer can observe.
+包版本跟随工具契约版本。首次公开版本使用 `0.2.0`，而不是 `0.1.0`，因为 Core v0.2 契约包含严格 Core v0.1 消费者可观察到的变更。
 
-This repository is developed through `ai-codeops-harness` governance. Core v0 includes the deterministic Core, neutral fixtures, and a stdio MCP server adapter for the accepted Core v0 tool. PLAN-0001 migration passed human final review, and PLAN-0002 release preparation is approved and under way.
+本仓库通过 `ai-codeops-harness` 治理。Core v0 包含确定性计算核心、中立 fixtures，以及面向已接受 Core v0 工具的 stdio MCP Server Adapter（MCP 服务适配层）。
 
-Release Candidate means the Core v0 scope, MCP Tool Contract（MCP 工具契约）, and stdio runtime are validated, but the package has not been published to a package index and no public release has been tagged.
+当前包尚未发布到 package index，也没有创建公开 release tag。
 
-## Quick Start
+## 快速开始
 
-Prerequisite: Python 3.11 or newer and MCP SDK 2.1 or newer.
+前置要求：Python 3.11 或更新版本，MCP SDK 2.1 或更新版本。
 
-Install from source:
+从源码安装：
 
 ```bash
 python -m pip install -e .
 ```
 
-Run the MCP server from a source checkout:
+从源码 checkout 运行 MCP 服务：
 
 ```bash
 PYTHONPATH=src python -m mcp_ess_proposal
 ```
 
-Equivalent installed console script:
+安装后的等价命令：
 
 ```bash
 mcp-ess-proposal
 ```
 
-MCP clients should connect over stdio and call `generate_ess_proposal` with structured inputs. Example arguments:
+MCP Client（MCP 客户端）应通过 stdio 连接，并使用结构化输入调用 `generate_ess_proposal`。示例参数：
 
 ```json
 {
@@ -45,120 +45,125 @@ MCP clients should connect over stdio and call `generate_ess_proposal` with stru
 }
 ```
 
-`tariff_myr_per_kwh` is optional. When omitted, the server uses its bundled default tariff data and reports which source was used.
+`tariff_myr_per_kwh` 是可选参数。未提供时，服务会使用内置默认电价数据，并在响应中声明使用的数据来源。
 
-## Core Scope
+## Core 范围
 
-Core v0 provides:
+Core v0 包含：
 
-- MCP Server（MCP 服务）.
-- MCP Tool Contract（MCP 工具契约）.
-- Neutral sample data fixtures.
-- Deterministic Calculation（确定性计算） from structured inputs.
+- MCP Server（MCP 服务）。
+- MCP Tool Contract（MCP 工具契约）。
+- 中立样例数据 fixtures。
+- 基于结构化输入的 Deterministic Calculation（确定性计算）。
 
-Core v0 does not include:
+Core v0 不包含：
 
-- Lead（线索） capture.
-- CRM writes.
-- Private platform database writes.
-- OCR / LLM provider calls.
-- Prompt（提示词） or Skill（技能） logic.
-- Runtime uploads or local image processing.
+- Lead（线索）采集。
+- CRM 写入。
+- 私有平台数据库写入。
+- OCR / LLM provider 调用。
+- Prompt（提示词）或 Skill（技能）逻辑。
+- 运行时上传或本地图片处理。
 
-## Tool Contract
+## 工具契约
 
-The accepted Core v0 tool contract is documented in [docs/contracts/mcp-tools.md](docs/contracts/mcp-tools.md).
+已接受的 Core v0 工具契约见 [docs/contracts/mcp-tools.md](docs/contracts/mcp-tools.md)。
 
-Core v0.2 exposes one public tool:
+Core v0.2 只暴露一个 public tool（公开工具）：
 
 - `generate_ess_proposal`
 
-Behaviour worth knowing before you call it:
+调用前需要了解的行为：
 
-- **Consumption precedence** — `monthly_kwh` is the authoritative measurement and is never overridden by a value derived from `monthly_bill_myr`. Supply only one when you can.
-- **Consistency validation** — if you supply both and they disagree by more than 10%, the tool returns `INCONSISTENT_CONSUMPTION_INPUT` rather than silently choosing one. The error `details` carry the implied bill, the resolved tariff, and the deviation.
-- **Tariff source** — every successful response reports `tariff_source` as `user_provided`, `default_residential_tiered`, or `default_non_residential`.
-- **Investment scope** — `financial.investment_scope` is always `pv_only`. Storage is sized when requested but is **not** priced, so `estimated_investment_myr` is not a whole-system cost.
+- **Consumption precedence（用电量优先级）**：`monthly_kwh` 是权威用电量输入，不会被从 `monthly_bill_myr` 推导出的值覆盖。能只提供一个输入时，建议只提供一个。
+- **Consistency validation（一致性校验）**：如果同时提供 `monthly_kwh` 和 `monthly_bill_myr`，且两者偏差超过 10%，工具返回 `INCONSISTENT_CONSUMPTION_INPUT`，不会静默选择其中一个。错误响应的 `details` 包含推导电费、解析后的电价和偏差。
+- **Tariff source（电价来源）**：每个成功响应都会返回 `tariff_source`，取值为 `user_provided`、`default_residential_tiered` 或 `default_non_residential`。
+- **Investment scope（投资范围）**：`financial.investment_scope` 始终为 `pv_only`。如果请求备电，系统会给出储能容量建议，但不会计入储能价格，因此 `estimated_investment_myr` 不是完整系统总投资。
+- **Protocol-required normalization（协议要求的规范化）**：MCP SDK 2.x runtime discovery 的 output schema 会在已接受 `oneOf` 分支外增加顶层 `type: "object"`。这是 [Contract AMENDMENT-0002](docs/contracts/AMENDMENT-0002-mcp-2-output-schema-normalization.md) 授权的最小协议表示规范化，不改变业务契约语义。
 
-Excluded from Core v0:
+Core v0 排除以下工具：
 
 - `submit_consultation_lead`
 - `generate_ess_proposal_from_bill`
 - `hello`
 
-## Configuration
+## 配置
 
-Core v0 has no required runtime secrets.
+Core v0 不需要运行时密钥。
 
-Required environment variables: none.
+必需环境变量：无。
 
-The runtime does not load `.env` files or read provider, OCR / LLM, CRM, or database settings. `.env.example` is intentionally variable-free and exists only to make that zero-secret contract explicit.
+运行时不会加载 `.env` 文件，也不会读取 provider、OCR / LLM、CRM 或数据库配置。`.env.example` 故意不声明任何变量，用于明确零密钥运行契约。
 
-## Data
+## 数据
 
-Core v0 data fixtures are documented in [docs/data/fixtures.md](docs/data/fixtures.md). They are neutral sample values for validation, not official tariffs or quotations.
+Core v0 数据 fixtures 见 [docs/data/fixtures.md](docs/data/fixtures.md)。这些值是用于验证的中立样例，不是官方电价或商业报价。
 
-## Runtime Path
+## 运行路径
 
-- Host / MCP Client starts `mcp_ess_proposal` over stdio.
-- `src/mcp_ess_proposal/server.py` registers `generate_ess_proposal`.
-- The MCP handler validates input through the SDK schema path and delegates to `src/mcp_ess_proposal/calculator.py`.
-- `calculator.py` uses `models.py` and package fixtures loaded by `data.py`.
-- The server returns contract-shaped structured content.
+- Host / MCP Client 通过 stdio 启动 `mcp_ess_proposal`。
+- `src/mcp_ess_proposal/server.py` 注册 `generate_ess_proposal`。
+- MCP handler 接收结构化参数并委托给 `src/mcp_ess_proposal/calculator.py`。
+- `calculator.py` 使用 `models.py` 和由 `data.py` 加载的包内 fixtures。
+- 服务返回符合契约形状的 structured content（结构化内容）。
 
-The calculator, models, data loader, and fixtures do not depend on the MCP SDK.
+`calculator.py`、`models.py`、`data.py` 和 fixtures 不依赖 MCP SDK。
 
-## Development
+## 开发
 
-The MCP server runs over stdio for Core v0:
+Core v0 的 MCP 服务通过 stdio 运行：
 
 ```bash
 PYTHONPATH=src python -m mcp_ess_proposal
 ```
 
-The server registers only the accepted `generate_ess_proposal` tool. Remote HTTP, authentication, OCR / LLM, provider integrations, and private adapters are outside Core v0.
+服务只注册已接受的 `generate_ess_proposal` 工具。Remote HTTP（远程 HTTP）、authentication（鉴权）、OCR / LLM、provider 集成和私有适配器均不属于 Core v0。
+
+本地验证：
 
 ```bash
 python -m compileall src tests
 PYTHONPATH=src python -m unittest discover -s tests
 ```
 
-`tests/test_server.py` and `tests/test_stdio_runtime.py` require the `mcp` SDK, which is installed with the package. The remaining tests run without it.
+`tests/test_server.py`、`tests/test_stdio_runtime.py` 和 `tests/test_stdio_runtime_v0_2.py` 需要 `mcp` SDK；该依赖会随包安装。其余测试不依赖 MCP SDK。
 
-## Continuous Integration
+## 持续集成
 
-`.github/workflows/ci.yml` runs a single test-only job on Python 3.11, the minimum supported version. It performs:
+`.github/workflows/ci.yml` 在 Python 3.11 上运行单一 test-only job（仅测试任务）。它执行：
 
 - `python -m compileall src tests`
 - `python -m unittest discover -s tests`
-- a distribution build
-- an installed-wheel check that the bundled fixtures are present
+- distribution build（分发构建）
+- installed-wheel check（已安装 wheel 检查），确认包内 fixtures 存在
 
-The workflow requests read-only repository permissions and defines no secrets, deployment, or publishing steps.
+该 workflow 只请求 read-only repository permissions（只读仓库权限），不包含 secrets、部署或发布步骤。
 
-## License
+## 许可证
 
-Released under the MIT License. See [LICENSE](LICENSE).
+本项目使用 MIT License。见 [LICENSE](LICENSE)。
 
-## Support Boundaries
+## 支持边界
 
-- Supported（支持）: stdio transport, the accepted `generate_ess_proposal` tool, Python 3.11 or newer.
-- Not implemented（未实现）: storage pricing, total system investment, and battery ROI. `financial.investment_scope` marks this explicitly.
-- Not supported（不支持）: Remote HTTP（远程 HTTP） transport, authentication, provider / OCR / LLM integration, CRM or database writes, and Lead（线索） capture. These are outside Core v0 and are not planned in this repository.
-- Fixture values are neutral samples for validation. They are not official tariffs or commercial quotations, and must not be used as a basis for pricing decisions.
+- Supported（支持）：stdio transport、已接受的 `generate_ess_proposal` 工具、Python 3.11 或更新版本、MCP SDK 2.1 或更新版本。
+- Not implemented（未实现）：储能定价、完整系统总投资、电池 ROI。`financial.investment_scope` 会明确标记这一点。
+- Not supported（不支持）：Remote HTTP（远程 HTTP）transport、authentication（鉴权）、provider / OCR / LLM 集成、CRM 或数据库写入、Lead（线索）采集。这些都在 Core v0 之外，本仓库当前不规划实现。
+- Fixture values（样例数据值）只用于验证，不是官方电价或商业报价，不能作为定价决策依据。
 
-## Governance
+## 治理
 
-Current governing artifacts:
+当前治理产物：
 
 - [ADR-0001](docs/adr/ADR-0001-mcp-ess-open-source-boundaries.md)
+- [ADR-0002](docs/adr/ADR-0002-open-source-governance-artifact-boundary.md)
 - [PLAN-0001](docs/plan/PLAN-0001-mcp-ess-open-source-migration.md)
 - [PLAN-0002](docs/plan/PLAN-0002-release-preparation.md)
-- [MCP Tool Contracts](docs/contracts/mcp-tools.md) (Core v0.2)
-- [Contract AMENDMENT-0001](docs/contracts/AMENDMENT-0001-generate-ess-proposal-consumption-and-tariff.md)
 - [PLAN-0003](docs/plan/PLAN-0003-contract-v0-2-implementation.md)
+- [MCP Tool Contracts](docs/contracts/mcp-tools.md)（Core v0.2）
+- [Contract AMENDMENT-0001](docs/contracts/AMENDMENT-0001-generate-ess-proposal-consumption-and-tariff.md)
+- [Contract AMENDMENT-0002](docs/contracts/AMENDMENT-0002-mcp-2-output-schema-normalization.md)
 
-Current Harness recovery artifacts:
+当前 Harness recovery artifacts（Harness 恢复产物）：
 
 - [.ai/state/execution-state.yaml](.ai/state/execution-state.yaml)
 - [docs/handoff/HANDOFF-current.md](docs/handoff/HANDOFF-current.md)

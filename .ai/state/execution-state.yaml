@@ -100,7 +100,7 @@ adr_decisions:
       included_after_sanitization:
         - .ai/state/**
 release:
-  stage: BLOCKED_CLAUDE_HOST_AUTH_PENDING_CI_RERUN
+  stage: BLOCKED_EXTERNAL_AUTH_AND_CI_OBSERVABILITY
   package_version: 0.2.0
   contract_version: Core v0.2
   baseline_files: 47
@@ -108,7 +108,8 @@ release:
   repository: AlanHuang168/mcp-ess-proposal
   repository_visibility: private
   pushed_commit: 34a179f01fbfa825a78125e8a24e6ba7b7de9ca1
-  ci_result: FAILURE
+  ci_result: UNOBSERVED_AFTER_RERUN_TRIGGER
+  ci_observation_blocker: private GitHub Actions status requires authenticated GitHub access; gh is absent and unauthenticated REST returns 404
   authorized_up_to: release_candidate_ready
   not_authorized:
     - GitHub Release
@@ -404,9 +405,9 @@ dependency_drift:
         returns API 403 before any MCP tool call.
     not_run:
       - Claude Host E2E on MCP 2.x, blocked by host authentication.
-      - GitHub CI rerun result, pending push / remote status check.
+      - GitHub CI rerun result, not observable from this session after push.
 recommended_next_action: >-
-  Commit and push the MCP 2.x dependency-alignment fix to trigger GitHub CI.
-  Do not mark Release Candidate Ready until GitHub CI passes and true Claude
-  Host E2E is rerun under MCP 2.x with a logged-in Claude host. No tag, release,
-  registry publish, or public announcement is authorized.
+  Observe GitHub CI with authenticated GitHub access and rerun true Claude Host
+  E2E under MCP 2.x with a logged-in Claude host. Do not mark Release Candidate
+  Ready until both pass. No tag, release, registry publish, or public
+  announcement is authorized.

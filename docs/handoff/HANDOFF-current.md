@@ -6,7 +6,7 @@ Date: 2026-08-29
 
 Workflow: IMPL
 
-Status（状态）: **Blocked External Host Auth（外部 Host 认证阻塞） / Pending CI Rerun（等待 CI 重跑）**. MCP Tool Contract is Core v0.2, dependency alignment to MCP SDK 2.1.1 is locally validated, and Release Safety Gate passes. Release Candidate Ready（发布候选就绪） is not restored because true Claude Host E2E could not run without Claude authentication and GitHub CI rerun is not yet observed.
+Status（状态）: **Blocked External Auth（外部认证阻塞） / CI Observation Blocked（CI 观察阻塞）**. MCP Tool Contract is Core v0.2, dependency alignment to MCP SDK 2.1.1 is locally validated, and Release Safety Gate passes. Release Candidate Ready（发布候选就绪） is not restored because true Claude Host E2E could not run without Claude authentication and GitHub CI status is not observable from this unauthenticated session.
 
 Approval Record（审批记录）:
 
@@ -111,7 +111,7 @@ Accepted boundary:
 | Schema fidelity | PASS; runtime discovery adds only approved root `type: object` normalization |
 | Claude Code Host E2E | BLOCKED; local Claude auth is absent (`loggedIn: false`, API 403 before MCP calls) |
 | Release Safety Gate | PASS, 0 findings, 3 allowlisted, 0 unscannable binaries |
-| CI | first run failed on MCP dependency drift; rerun pending after fix push |
+| CI | fix pushed; status not observable here because private GitHub Actions requires authenticated access |
 | Public baseline | 47 files |
 | Package build | wheel/sdist built and fresh wheel install smoke passed under Python 3.11 + MCP 2.1.1 |
 
@@ -298,4 +298,6 @@ Blocked（阻塞）:
 
 ## Next Required Action
 
-Commit and push the MCP 2.x dependency-alignment fix to trigger GitHub CI rerun. Do not restore Release Candidate Ready until GitHub CI passes and true Claude Host E2E is rerun under MCP 2.x with an authenticated Claude host. No git tag, GitHub Release, registry publish, or public announcement is authorized.
+The MCP 2.x dependency-alignment fix was committed and pushed to trigger GitHub CI rerun. CI status is not observable here: `gh` is unavailable and unauthenticated GitHub REST returns 404 for the private repository.
+
+Do not restore Release Candidate Ready until GitHub CI passes and true Claude Host E2E is rerun under MCP 2.x with an authenticated Claude host. No git tag, GitHub Release, registry publish, or public announcement is authorized.

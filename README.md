@@ -4,7 +4,9 @@ Open-source MCP Server（开源 MCP 服务） for deterministic solar and energy
 
 ## Status
 
-Version（版本）: **0.1.0 — Release Candidate（发布候选）**. MCP Tool Contract（MCP 工具契约）: **Core v0.2**.
+Version（版本）: **0.2.0**. MCP Tool Contract（MCP 工具契约）: **Core v0.2**.
+
+The package version tracks the tool contract version. The first public release is `0.2.0`, not `0.1.0`, because the Core v0.2 contract carries changes that a strict Core v0.1 consumer can observe.
 
 This repository is developed through `ai-codeops-harness` governance. Core v0 includes the deterministic Core, neutral fixtures, and a stdio MCP server adapter for the accepted Core v0 tool. PLAN-0001 migration passed human final review, and PLAN-0002 release preparation is approved and under way.
 

@@ -98,7 +98,7 @@ adr_decisions:
         - .ai/state/**
 release:
   stage: RELEASE_CANDIDATE_READY
-  package_version: 0.1.0
+  package_version: 0.2.0
   contract_version: Core v0.2
   baseline_files: 47
   first_tracked_baseline: committed_locally
@@ -108,8 +108,13 @@ release:
     - GitHub Release
     - package registry publish
     - public announcement
-  open_decision:
-    - package version remains 0.1.0 while the contract moved to v0.2; confirm at publish approval
+  version_decision:
+    outcome: "0.2.0"
+    decided_at: "2026-08-29"
+    reason: >-
+      package version, contract version, git tag, and release version are kept
+      aligned; 0.1.0 is not used as the first public version because Core v0.2
+      carries changes observable to a strict Core v0.1 consumer.
 completed_tasks:
   - id: PLAN-0002-T1
     status: COMPLETE

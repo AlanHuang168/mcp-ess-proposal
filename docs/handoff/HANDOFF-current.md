@@ -258,4 +258,4 @@ One boundary question is raised for human ruling rather than resolved downstream
 
 STOP（停止） at Publish Approval（发布审批）.
 
-Open decision（待决）: the package version is still `0.1.0` while the tool contract moved to Core v0.2. The contract change is breaking for strict v0.1 consumers, so confirm whether the first published version should be `0.1.0` or `0.2.0` before any release.
+Version decision（版本决策）, 2026-08-29: the first public version is **0.2.0**. Package version, contract version, git tag, and release version are kept aligned, and `0.1.0` is not used because Core v0.2 carries changes a strict Core v0.1 consumer can observe.

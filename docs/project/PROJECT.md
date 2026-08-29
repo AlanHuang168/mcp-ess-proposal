@@ -69,4 +69,6 @@ PLAN-0001 Task 8 completed final Validation（验证）, package/runtime checks,
 
 PLAN-0001 was accepted as Complete（已完成） by Human Final Review on 2026-08-29. The current version is recognized as V0.1 Release Candidate（发布候选）.
 
-Router selected PLAN for the next Release Preparation（发布准备） phase. PLAN-0002 is pending Human Approval（等待人工审核） before implementation.
+Router selected PLAN for the next Release Preparation（发布准备） phase.
+
+Current state（当前状态）, 2026-08-29: PLAN-0002 and PLAN-0003 are complete. The MCP Tool Contract is Core v0.2 and the project version is **0.2.0**. The statements above are the historical record of each phase and are not restated as current facts.

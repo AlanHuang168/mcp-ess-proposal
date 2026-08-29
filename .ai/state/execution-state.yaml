@@ -71,7 +71,7 @@ plan_approval:
 current_task:
   id: MCP_SDK_2_DEPENDENCY_ALIGNMENT
   name: MCP SDK 2.x Dependency Alignment
-  status: BLOCKED_EXTERNAL_HOST_AUTH
+  status: BLOCKED_EXTERNAL
   checkpoint: null
 adr_decisions:
   adr: ADR-0002
@@ -108,10 +108,12 @@ release:
   repository: AlanHuang168/mcp-ess-proposal
   repository_visibility: private
   pushed_commit: 34a179f01fbfa825a78125e8a24e6ba7b7de9ca1
+  latest_pushed_commit: bb3880df60631a7e1f8d18dcd5cfea1768409dab
   ci_result: UNOBSERVED_AFTER_RERUN_TRIGGER
   ci_observation_blocker: private GitHub Actions status requires authenticated GitHub access; gh is absent and unauthenticated REST returns 404
   authorized_up_to: release_candidate_ready
   not_authorized:
+    - git tag
     - GitHub Release
     - package registry publish
     - public announcement
@@ -157,7 +159,15 @@ completed_tasks:
 task_sets:
   ready: []
   interrupted: []
-  blocked: []
+  blocked:
+    - id: MCP_SDK_2_DEPENDENCY_ALIGNMENT
+      state: BLOCKED_EXTERNAL
+      blocked_operations:
+        - Claude Host E2E on MCP 2.x
+        - GitHub CI status observation
+      external_dependencies:
+        - authenticated Claude Code host
+        - authenticated GitHub Actions access for private repository
   escalated: []
 validation_summary:
   PLAN-0001-T1:

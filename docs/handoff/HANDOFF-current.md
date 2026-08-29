@@ -35,6 +35,7 @@ After PLAN-0002-T4 found private internal detail in Governance Artifacts（治�
 ## Current Reality
 
 - The `mcp-ess-proposal` repository has an initial pushed baseline at `34a179f01fbfa825a78125e8a24e6ba7b7de9ca1`; the first GitHub CI run failed on MCP SDK dependency drift.
+- Current Git reality from resume: branch `master`, HEAD `bb3880df60631a7e1f8d18dcd5cfea1768409dab`, remote `origin/master` at the same commit, clean worktree before state reconciliation.
 - Current files include the accepted ADR, approved PLAN, accepted MCP Tool Contract, project scaffold, deterministic Core, neutral fixtures, stdio MCP Server Adapter, tests, and Harness recovery artifacts created during this governed migration.
 - `.ai/state/execution-state.yaml`, `docs/handoff/HANDOFF-current.md`, and `docs/project/` were absent at session start and now exist as Harness recovery / project context artifacts.
 - `private-source-tool` source path is `<PRIVATE_SOURCE_ROOT>`.
@@ -301,3 +302,11 @@ Blocked（阻塞）:
 The MCP 2.x dependency-alignment fix was committed and pushed to trigger GitHub CI rerun. CI status is not observable here: `gh` is unavailable and unauthenticated GitHub REST returns 404 for the private repository.
 
 Do not restore Release Candidate Ready until GitHub CI passes and true Claude Host E2E is rerun under MCP 2.x with an authenticated Claude host. No git tag, GitHub Release, registry publish, or public announcement is authorized.
+
+## Resume Check 2026-08-29（恢复检查）
+
+Installed Runtime Evidence（已安装运行时证据）: `.ai/VERSION` reports `ai-codeops-harness` version `0.1.0`, installed adapter `codex`, and 19 managed files. Checksum verification during resume checked all 19 managed files with no missing or mismatched file. The active `AGENTS.md`, `.ai/workflows/orchestrator.md`, and `.ai/workflows/impl.md` contain `plan_continuous` rules.
+
+Resume Evidence（恢复证据）: Runtime State（运行状态） resumed from `docs/plan/PLAN-0003-contract-v0-2-implementation.md` and `docs/contracts/AMENDMENT-0002-mcp-2-output-schema-normalization.md`. PLAN-0003 T1-T10 are recorded complete, with no READY or INTERRUPTED task. Current external blockers remain Claude Host E2E authentication and private GitHub Actions status observation.
+
+Current validation rerun（当前验证重跑）: MCP SDK in the clean validation env is `2.1.1`; `tests.test_stdio_runtime_v0_2.McpHostRoundTripV02Tests` passed 8 tests; Release Safety Gate passed with 0 findings, 3 allowlisted, and 0 unscannable files.
